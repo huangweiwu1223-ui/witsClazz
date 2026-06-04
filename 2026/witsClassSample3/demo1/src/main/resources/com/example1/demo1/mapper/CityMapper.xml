@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    CityMapper.xml
+    對應 com.example1.demo1.mapper.CityMapper 介面。
+    把客製 SQL 放在這裡，跟 Java 程式碼分離，方便 DBA 與後端工程師協作。
+-->
+<mapper namespace="com.example1.demo1.mapper.CityMapper">
+
+    <!-- 結果對應：DB 欄位名(大小寫敏感視 DB) -> Java 屬性名 -->
+    <resultMap id="CityResultMap" type="com.example1.demo1.entity.City">
+        <id property="id" column="ID"/>
+        <result property="name" column="Name"/>
+        <result property="countryCode" column="CountryCode"/>
+        <result property="district" column="District"/>
+        <result property="population" column="Population"/>
+    </resultMap>
+
+    <!-- 依國家代碼查詢全部城市 -->
+    <select id="selectByCountryCode" resultMap="CityResultMap">
+        SELECT ID, Name, CountryCode, District, Population
+        FROM city
+        WHERE CountryCode = #{code}
+    </select>
+
+</mapper>
