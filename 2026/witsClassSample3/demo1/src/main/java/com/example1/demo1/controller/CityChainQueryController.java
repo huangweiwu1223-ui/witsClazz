@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example1.demo1.commons.ApiResponse;
 import com.example1.demo1.entity.City;
 import com.example1.demo1.mapper.CityMapper;
@@ -63,7 +62,6 @@ public class CityChainQueryController {
     }
 
     /**
-     * 組合試煉接串接查資料-使用 between
      * id 介於 3950~4000，有6筆
      * @param idFrom
      * @param idTo
@@ -138,5 +136,38 @@ public class CityChainQueryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok(rstCity));
     }
-    
+
+    /**
+     * 由 SQL 翻為 查詢建構器
+		select id, name, countrycode, district, population 
+		from city 
+		where name like 'K%'
+		and countrycode in (select code from country where continent = 'Asia')
+		and Population >= 550000
+		and id between 1000 and 2000
+		and district like '%er%'
+     * @return
+     */
+    @GetMapping("/queryWrapper2")
+    @Operation(summary = "由SQL翻為 LambdaQueryWrapper", description = "由SQL翻為 LambdaQueryWrapper")
+    public ResponseEntity<ApiResponse<List<City>>> queryWrapper2(){
+
+        LambdaQueryWrapper<City> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        StringBuilder sbSQL = new StringBuilder();
+        sbSQL.append("select Code from world.country where continent = 'Asia'");
+
+        lambdaQueryWrapper
+            .select(City::getId, City::getName, City::getCountryCode, City::getDistrict, City::getPopulation)
+            .likeRight(City::getName, "K")
+            .inSql(City::getCountryCode, sbSQL.toString())
+            .ge(City::getPopulation, 550000)
+            .between(City::getId, 1000, 2000)
+            .like(City::getDistrict, "er")
+            ;
+
+            List<City> rstCity = cityMapper.selectList(lambdaQueryWrapper);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.ok(rstCity));
+    } 
 }
