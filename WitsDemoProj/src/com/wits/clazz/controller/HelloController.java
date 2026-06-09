@@ -143,5 +143,28 @@ public class HelloController {
 		
 		return "city";
 	}
+	
+	/**
+	 * ㊣BatchClazz.doTransaction 暗ユ北
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/doTransaction_1", method = RequestMethod.POST)
+	public String doTransaction_1City(String isCommit, String isThrowException, Model model) {
+		
+		try {
+			// 眔 MySQL 硈絬
+			Connection con = dbutils.getConnectionPool("mysQL");
+			
+			dbutils.doTransaction_1(con, StringUtils.equals("Y", isCommit)?true:false, StringUtils.equals("Y", isThrowException)?true:false);
+			
+			model.addAttribute("errMsg", "ユ北代刚ЧΘ");
+			
+		} catch (Exception e) {
+			model.addAttribute("errMsg", "ユ北代刚ア毖, e:" + e.getMessage());
+		}
+
+		return "city";
+	}
 
 }

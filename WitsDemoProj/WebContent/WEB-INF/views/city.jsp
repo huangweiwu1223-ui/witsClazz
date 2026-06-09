@@ -33,7 +33,15 @@ debugger;
 		<br/>
 		District<input type="text" name="district" value="${district }"><br/>
 		
-		<input type="submit" value="送出">
+		<input type="submit" value="送出">&nbsp;
+	</form>
+	<hr/>
+	<form action="doTransaction_1" method="post">
+		<input type="radio" name="isCommit" value="Y">我要測Commit
+		<input type="radio" name="isCommit" value="N" checked>我要測Rollback<br/>
+		<input type="radio" name="isThrowException" value="Y">我要在中途測試拋出Exception
+		<input type="radio" name="isThrowException" value="N" checked>我要正常執行<br/>
+		<input type="submit" value="交易控制測試">
 	</form>
 	<hr/>
 	<table border="1">

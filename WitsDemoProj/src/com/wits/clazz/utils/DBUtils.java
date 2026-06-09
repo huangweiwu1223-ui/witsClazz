@@ -217,5 +217,75 @@ public class DBUtils {
 		}
 		return rtnList;
 	}
+	
+	/**
+	 * 測試交易控制
+	 * @throws Exception
+	 */
+	public void doTransaction_1(Connection con, boolean isCommit, boolean isThrowException) throws Exception {
+		
+		try {
+			if (null == con) {
+				throw new Exception("con 為 null..!");
+			}
+			
+			System.out.println("連線取得成功");
+			
+		} catch (Exception e) {
+			System.out.println("取得資料庫連線發生異常.., e:" + e.getMessage());
+			throw new Exception("取得資料庫連線發生異常.., e:" + e.getMessage(), e);
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("update city ");
+		sb.append("set population = population - 200 ");
+//		sb.append("set population = population + 200 ");
+		sb.append("where id in ( 4090, 4098 ) ");
+		
+//		PreparedStatement pstmt = con.prepareStatement(sb.toString());
+		Statement stmt = con.createStatement();
+		
+		con.setAutoCommit(false);
+		try {
+//			int resultCnt = pstmt.executeUpdate();
+			int resultCnt = stmt.executeUpdate(sb.toString());
+			
+			System.out.println("第一段 SQL 更新完成, 筆數:" + resultCnt);
+			
+			sb.setLength(0);
+			sb.append("update city ").append("set name = 'TTES-001' ").append("where id = '4099' ");
+//			sb.append("update city ").append("set name = 'TTES' ").append("where id = '4099' ");
+			
+			if (isThrowException) {
+				throw new Exception("測試途中拋錯");
+			}
+			
+//			pstmt = con.prepareStatement(sb.toString());
+//			resultCnt = pstmt.executeUpdate();
+			
+			resultCnt = stmt.executeUpdate(sb.toString());
+			
+			System.out.println("第二段 SQL 更新完成, 筆數:" + resultCnt);
+			
+			// 是否要 commit
+			if (isCommit) {
+				System.out.println("commit 交易");
+				con.commit();
+				
+			} else {
+				System.out.println("rollback 交易");
+				con.rollback();
+				
+			}
+			
+		} catch (Exception e) {
+			con.rollback();
+			System.out.println("Exception, 拋錯");
+			throw e;
+		}
+		
+		System.out.println("doTransaction 執行完成");
+		
+	}
 
 }
